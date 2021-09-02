@@ -1,5 +1,7 @@
 const serverCommands = require('../server.js');
 const Discord = require('discord.js')
+const fs = require('fs');
+const path = require('path');
 
 const CHANNELS = {
     'stopStudyChannel': '882783531531653210'
@@ -37,5 +39,19 @@ exports.ping = (message, args) => {
 }
 
 exports.set = (message, args, guildRoles) => {
-    serverCommands.changeEnvInfo('BOT_PREFIX', args[0])
+    // Check if Authorisation is correct
+    if(!message.member.roles.cache.some(r => r.name === 'Admin'))
+    {
+        message.reply('You do not have authorisation!')
+        return 0
+    }
+
+    // Check if the parameter is valid (e.g prefix etc)
+    
+    const valuesData = JSON.parse(fs.readFileSync(path.join(__dirname + '/../values.json')))
+    if(!valuesData[`${args[0]}`]) return 0 // Value not in JSON File
+
+    // Change the value
+    serverCommands.changeEnvInfo(args[0], args[1])
+
 }

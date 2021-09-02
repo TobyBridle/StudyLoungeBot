@@ -62,8 +62,10 @@ client.on('messageCreate', (message) => {
     if (message.content.startsWith(BOT_PREFIX))
     {
         // Get Command
-        let [command, args] = message.content.slice(1, message.content.length).split(' ')
-
+        const userCommand = message.content.slice(BOT_PREFIX.length, message.content.length).split(' ')
+        const command = userCommand[0]
+        const args = userCommand.slice(1)
+        
         // Bundle PREFIX with Message - easier to access on `commands.js`
         message['__BOT_PREFIX'] = BOT_PREFIX
 
