@@ -14,20 +14,20 @@ exports.study = async (message, args, guildRoles) => {
     message.author.send('You\'re now studying!')
 
     message.guild.channels.cache.get(CHANNELS.stopStudyChannel).send(`Welcome ${message.author} to Study Mode. Type \`${BOT_PREFIX}stop\` to end the session.`)
-    guildRoles.forEach(r => {
-        if(r.role.name === 'Studying') message.member.roles.add(r.role.id)
+    guildRoles.forEach(async (r) => {
+        if(r.role.name === 'Studying') await message.member.roles.add(r.role.id)
     })
 
-    await message.delete()
+    message.delete()
 }
 
 exports.stop = async (message, args, guildRoles) => {
     if (message.channelId !== CHANNELS.stopStudyChannel) return 0
-    guildRoles.forEach(r => {
-        if(r.role.name === 'Studying') message.member.roles.remove(r.role.id)
+    guildRoles.forEach(async (r) => {
+        if(r.role.name === 'Studying') await message.member.roles.remove(r.role.id)
     })
 
-    await message.author.send('Study Mode Ended!')
+    message.author.send('Study Mode Ended!')
 }
 exports.ping = (message, args) => {
     console.log('Pong!')
