@@ -1,14 +1,12 @@
 const serverCommands = require('../server.js');
 const Discord = require('discord.js')
-var BOT_PREFIX = ''
-
-serverCommands.getValues('../')
 
 const CHANNELS = {
     'stopStudyChannel': '882783531531653210'
 }
 
 exports.study = async (message, args, guildRoles) => {
+    BOT_PREFIX = message['__BOT_PREFIX']
     if(!typeof([args][0], 'int') && args)
     {
         message.reply(`To enter study mode:\n${BOT_PREFIX}study`)

@@ -38,7 +38,7 @@ const changeEnvInfo = (row, data) => {
         fileData[row] = data
         fs.writeFileSync('./values.json', JSON.stringify(fileData)) // Rewrite data
         // Re read
-        getValues()
+        getValues('./')
     }
     return
 }
@@ -63,6 +63,11 @@ client.on('messageCreate', (message) => {
     {
         // Get Command
         let [command, args] = message.content.slice(1, message.content.length).split(' ')
+
+        // Bundle PREFIX with Message - easier to access on `commands.js`
+        message['__BOT_PREFIX'] = BOT_PREFIX
+
+        // If the command is valid, run the function and pass the message, arguments and roles for the server
         if(commands[command]) (commands[command](message, args, Roles[message.member.guild.id]))
     }
 })
