@@ -20,8 +20,12 @@ exports.study = async (message, args, guildRoles) => {
     await message.delete()
 }
 
-exports.stop = (message, args, guildRoles) => {
-    console.log(guildRoles.get('Studying'))
+exports.stop = async (message, args, guildRoles) => {
+    guildRoles.forEach(r => {
+        r.role.name === 'Studying' ? message.member.roles.remove(r.role.id) : ''
+    })
+
+    await message.author.send('Study Mode Ended!')
 }
 exports.ping = (message, args) => {
     console.log('Pong!')
