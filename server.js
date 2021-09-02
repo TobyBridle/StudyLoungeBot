@@ -1,8 +1,6 @@
-require('dotenv').config()
-const { TOKEN, BOT_PREFIX } = process.env
 const fs = require('fs')
 
-const { Client, Intents, Collection, Role } = require('discord.js')
+const { Client, Intents, Role } = require('discord.js')
 
 const botIntentList = new Intents()
 botIntentList.add(
@@ -15,23 +13,40 @@ const client = new Client({ intents: botIntentList })
 const commands = require('./scripts/commands.js');
 const Roles = {}
 
-const changeEnvInfo = (row, data) => {
-    envData = fs.readFileSync('./.env').toString().trim().split('\n')
-    tmp = ''
-    
-    for ( const [index, line] of envData.entries())
-    {
-        line.split(' = ')[0] === row ? tmp += `${row} = ${data}\n` : tmp += `${line}\n`
-    }
 
-    fs.writeFileSync('./.env', tmp.toString())
-    console.log('Changed a value in .env')
+// Load TOKEN and Prefix
+
+var TOKEN = ''
+var BOT_PREFIX = ''
+
+const getValues = (path) => {
+    fileData = JSON.parse(fs.readFileSync(`${path}values.json`));
+    
+    TOKEN = fileData['TOKEN']
+    BOT_PREFIX = fileData['BOT_PREFIX']
+    
+    return
 }
 
+getValues('./')
+
+
+const changeEnvInfo = (row, data) => {
+    const fileData = JSON.parse(fs.readFileSync('./values.json'))
+    if(fileData[row])
+    {
+        fileData[row] = data
+        fs.writeFileSync('./values.json', JSON.stringify(fileData)) // Rewrite data
+        // Re read
+        getValues()
+    }
+    return
+}
 client.once('ready', (c) => {
     
     c.guilds.cache.find(g => {
         Roles[`${g.id}`] = []
+
         g.roles.cache.find(r => {
             Roles[`${g.id}`].push({
                 role: r
@@ -47,11 +62,14 @@ client.on('messageCreate', (message) => {
     if (message.content.startsWith(BOT_PREFIX))
     {
         // Get Command
-        let [command, args]= message.content.slice(1, message.content.length).split(' ')
+        let [command, args] = message.content.slice(1, message.content.length).split(' ')
         if(commands[command]) (commands[command](message, args, Roles[message.member.guild.id]))
     }
 })
 
 client.login(TOKEN)
 
+exports.getValues = function(){
+    console.log('Hello')
+}
 exports.changeEnvInfo = changeEnvInfo

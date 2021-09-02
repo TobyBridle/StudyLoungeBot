@@ -1,20 +1,20 @@
-require('dotenv').config()
-const { BOT_PREFIX } = process.env
+const serverCommands = require('../server.js');
 const Discord = require('discord.js')
+var BOT_PREFIX = ''
+
+serverCommands.getValues('../')
 
 const CHANNELS = {
     'stopStudyChannel': '882783531531653210'
 }
 
-const changeEnv = require('../server.js')
-
 exports.study = async (message, args, guildRoles) => {
     if(!typeof([args][0], 'int') && args)
     {
         message.reply(`To enter study mode:\n${BOT_PREFIX}study`)
-        return 0
+        return
     }
-    
+
     message.author.send('You\'re now studying!')
 
     message.guild.channels.cache.get(CHANNELS.stopStudyChannel).send(`Welcome ${message.author} to Study Mode. Type \`${BOT_PREFIX}stop\` to end the session.`)
@@ -26,17 +26,18 @@ exports.study = async (message, args, guildRoles) => {
 }
 
 exports.stop = async (message, args, guildRoles) => {
-    if (message.channelId !== CHANNELS.stopStudyChannel) return 0 // Command should only work inside the stop-study channel
+    if (message.channelId !== CHANNELS.stopStudyChannel) return // Command should only work inside the stop-study channel
     guildRoles.forEach(async (r) => {
         if(r.role.name === 'Studying') await message.member.roles.remove(r.role.id)
     })
 
     message.author.send('Study Mode Ended!')
 }
+
 exports.ping = (message, args) => {
     console.log('Pong!')
 }
 
 exports.set = (message, args, guildRoles) => {
-    changeEnv('BOT_PREFIX', args[0])
+    serverCommands.changeEnvInfo('BOT_PREFIX', args[0])
 }
