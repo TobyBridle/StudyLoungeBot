@@ -22,7 +22,7 @@ exports.study = async (message, args, guildRoles) => {
 }
 
 exports.stop = async (message, args, guildRoles) => {
-    if (message.channelId !== CHANNELS.stopStudyChannel) return 0
+    if (message.channelId !== CHANNELS.stopStudyChannel) return // Command should only work inside the stop-study channel
     guildRoles.forEach(async (r) => {
         if(r.role.name === 'Studying') await message.member.roles.remove(r.role.id)
     })
