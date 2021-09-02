@@ -3,15 +3,18 @@ const { TOKEN, BOT_PREFIX } = process.env
 const fs = require('fs')
 
 const { Client, Intents, Collection, Role } = require('discord.js')
+
 const botIntentList = new Intents()
 botIntentList.add(
     Intents.FLAGS.GUILDS,
     Intents.FLAGS.GUILD_MESSAGES,
     Intents.FLAGS.DIRECT_MESSAGES
     )
+
 const client = new Client({ intents: botIntentList })
 const commands = require('./scripts/commands.js');
 const Roles = {}
+
 const changeEnvInfo = (row, data) => {
     envData = fs.readFileSync('./.env').toString().trim().split('\n')
     tmp = ''
@@ -44,10 +47,11 @@ client.on('messageCreate', (message) => {
     if (message.content.startsWith(BOT_PREFIX))
     {
         // Get Command
-     
         let [command, args]= message.content.slice(1, message.content.length).split(' ')
-        commands[command] ? (commands[command](message, args, Roles[message.member.guild.id])) : ''
+        if(commands[command]) (commands[command](message, args, Roles[message.member.guild.id]))
     }
 })
 
 client.login(TOKEN)
+
+exports.changeEnvInfo = changeEnvInfo
