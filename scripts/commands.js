@@ -9,7 +9,11 @@ const CHANNELS = {
 const changeEnv = require('../server.js')
 
 exports.study = async (message, args, guildRoles) => {
-    if(!typeof([args][0], 'int') && args) return message.reply(`To enter study mode:\n${BOT_PREFIX}study`)
+    if(!typeof([args][0], 'int') && args)
+    {
+        message.reply(`To enter study mode:\n${BOT_PREFIX}study`)
+        return 0
+    }
     
     message.author.send('You\'re now studying!')
 
@@ -22,7 +26,7 @@ exports.study = async (message, args, guildRoles) => {
 }
 
 exports.stop = async (message, args, guildRoles) => {
-    if (message.channelId !== CHANNELS.stopStudyChannel) return // Command should only work inside the stop-study channel
+    if (message.channelId !== CHANNELS.stopStudyChannel) return 0 // Command should only work inside the stop-study channel
     guildRoles.forEach(async (r) => {
         if(r.role.name === 'Studying') await message.member.roles.remove(r.role.id)
     })
