@@ -2,8 +2,10 @@ require('dotenv').config()
 const { BOT_PREFIX } = process.env
 const Discord = require('discord.js')
 
+const changeEnv = require('../server.js')
+
 exports.study = async (message, args, guildRoles) => {
-    if(!typeof([args][0], 'int') && args) return 0
+    if(!typeof([args][0], 'int') && args) return message.reply(`To enter study mode:\n${BOT_PREFIX}study`)
     args
     ?
     message.author.send(`You\'re now studying for ${args} minutes`)
@@ -18,6 +20,13 @@ exports.study = async (message, args, guildRoles) => {
     await message.delete()
 }
 
+exports.stop = (message, args, guildRoles) => {
+    console.log(guildRoles.get('Studying'))
+}
 exports.ping = (message, args) => {
     console.log('Pong!')
+}
+
+exports.set = (message, args, guildRoles) => {
+    changeEnv('BOT_PREFIX', '!')
 }

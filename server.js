@@ -1,6 +1,7 @@
 require('dotenv').config()
 const { TOKEN, BOT_PREFIX } = process.env
 const fs = require('fs')
+const { exec } = require("child_process");
 
 const { Client, Intents, Collection, Role } = require('discord.js')
 const botIntentList = new Intents()
@@ -23,6 +24,7 @@ const changeEnvInfo = (row, data) => {
 
     fs.writeFileSync('./.env', tmp.toString())
     console.log('Changed a value in .env')
+    process.exit(1) // Using Forever module the server will restart
 }
 
 client.once('ready', (c) => {
@@ -51,3 +53,5 @@ client.on('messageCreate', (message) => {
 })
 
 client.login(TOKEN)
+
+exports.changeEnvInfo = changeEnvInfo
