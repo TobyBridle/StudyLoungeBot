@@ -43,13 +43,13 @@ exports.set = (message, args, guildRoles) => {
     if(!message.member.roles.cache.some(r => r.name === 'Admin'))
     {
         message.reply('You do not have authorisation!')
-        return 0
+        return
     }
 
     // Check if the parameter is valid (e.g prefix etc)
     
     const valuesData = JSON.parse(fs.readFileSync(path.join(__dirname + '/../values.json')))
-    if(!valuesData[`${args[0]}`]) return 0 // Value not in JSON File
+    if(!valuesData[`${args[0]}`]) return // Value not in JSON File
 
     // Change the value
     serverCommands.changeEnvInfo(args[0], args[1])
