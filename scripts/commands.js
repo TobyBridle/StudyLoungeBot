@@ -7,6 +7,28 @@ const CHANNELS = {
     'stopStudyChannel': '882783531531653210'
 }
 
+exports.help = (message, args) => {
+    const commandsInfo = {
+        'help': `Prints a list of all available commands. Pass an argument to print the specific command info (e.g ${message['__BOT_PREFIX']}help study)\n`,
+        'study': 'Prevents user from seeing any channels unrelated to study-help. Does not end until the stop command is used.\n',
+        'stop': 'Ends the user\'s study session\n',
+        'set': 'Allows server administrators to modify variables such as the bot prefix'
+    }
+
+    botReply = '' // String that will be sent back to user
+
+    if(args[0] && commandsInfo[args[0]]){
+        message.reply(`\`${message['__BOT_PREFIX']}${args[0]}\` - ${commandsInfo[args[0]]}`)
+        return
+    }
+
+    Object.keys(commandsInfo).forEach(command => {
+        botReply += `\`${message['__BOT_PREFIX']}${command}\` - ${commandsInfo[command]}`
+    })
+
+    message.reply(botReply)
+}
+
 exports.study = async (message, args, guildRoles) => {
     BOT_PREFIX = message['__BOT_PREFIX']
     if(!typeof([args][0], 'int') && args)
@@ -52,6 +74,8 @@ exports.set = (message, args, guildRoles) => {
     if(!valuesData[`${args[0]}`]) return // Value not in JSON File
 
     // Change the value
-    serverCommands.changeEnvInfo(args[0], args[1])
-
+    if(serverCommands.changeEnvInfo(args[0], args[1]))
+    {
+        message.reply(`Changed the value of \`${args[0]}\` to \`${args[1]}\` successfully!`)
+    }
 }

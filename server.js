@@ -39,6 +39,7 @@ const changeEnvInfo = (row, data) => {
         fs.writeFileSync('./values.json', JSON.stringify(fileData)) // Rewrite data
         // Re read
         getValues('./')
+        return true // Is this appropriate? (Return value used in other function)
     }
     return
 }
