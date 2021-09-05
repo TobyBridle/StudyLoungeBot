@@ -2,6 +2,8 @@ const serverCommands = require('../server.js');
 const Discord = require('discord.js')
 const fs = require('fs');
 const path = require('path');
+const internal = require('stream');
+const { parse } = require('path');
 
 const CHANNELS = {
     'stopStudyChannel': '882783531531653210'
@@ -11,6 +13,7 @@ exports.help = (message, args) => {
     const commandsInfo = {
         'help': `Prints a list of all available commands. Pass an argument to print the specific command info (e.g ${message['__BOT_PREFIX']}help study)\n`,
         'silence': `Prevents a user from sending messages. Pass a second argument for to specify the amount of minutes they should be muted.\nIf this is not passed, it will default to indefinite. (e.g ${message['__BOT_PREFIX']}silence @example 10) \n`,
+        'speak': 'Allows the user to once again send messages\n',
         'delete': `Deletes messages from the channel. Pass an argument to specify the amount of messages to delete (e.g ${message['__BOT_PREFIX']}delete 50)\n`,
         'study': 'Prevents user from seeing any channels unrelated to study-help. Does not end until the stop command is used.\n',
         'stop': 'Ends the user\'s study session\n',
@@ -31,11 +34,28 @@ exports.help = (message, args) => {
     message.reply(botReply)
 }
 
-exports.silence = (message, args, guildRoles) => {
-    if(!args[0] || args[0].slice(1,1) !== '@')
+exports.speak = (message,args, guildRoles) => {
+    if(!message.mentions.members.first())
     {
         message.reply('User not found!').then(msg => {
-            setTimeout( msg.delete(), 2000)
+            setTimeout( () => msg.delete(), 2000)
+        })
+
+        return
+    }
+
+    guildRoles.forEach(r => {
+        if(r.role.name === 'Muted') message.mentions.members.first().roles.remove(r.role.id)
+    })
+
+
+}
+
+exports.silence = (message, args, guildRoles) => {
+    if(!message.mentions.members.first())
+    {
+        message.reply('User not found!').then(msg => {
+            setTimeout( () => msg.delete(), 2000)
         })
 
         return
@@ -44,32 +64,31 @@ exports.silence = (message, args, guildRoles) => {
     if(args[1] <= 0 || !args[1]) args[1] = -99
 
     guildRoles.forEach((r) => {
-        if(r === 'Muted')
+        if(r.role.name === 'Muted')
         {
-            message.author.roles.add(r)
+            message.mentions.members.first().roles.add(r.role.id)
 
-            setTimeout(() => {
-                message.author.roles.remove(r)
+            if(args[1] != -99)
+            {
+                setTimeout(() => {
+                message.mentions.members.first().roles.remove(r.role.id)
             }, args[1] * 1000 * 60)
+            
+            }
         }
     })
 }
 
 exports.delete = (message, args, guildRoles) => {
     
-    if(!args[0])
+    if(!args[0]) args[0] = 100
+    if(!parseInt( args[0] ) || parseInt( args[0]) <= 0) 
     {
-        args[0] = 100
-    }
-    
-    if(typeof(args[0]) !== 'number' || args[0] <= 0)
-    {
-        message.reply('Enter a valid Integer value for the argument!').then(msg => {
-            setTimeout( () => msg.delete(), 2000 )
+        message.reply('Enter a valid argument!').then( (msg) => {
+            setTimeout( () => msg.delete(), 2000)
         })
-        return;
+        return
     }
-    
     message.channel.bulkDelete(args[0]);
     
     message.reply(`Deleting \`${args[0]}\` messages!`).then(msg => {
