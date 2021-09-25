@@ -60,7 +60,7 @@ client.once('ready', (c) => {
 })
 
 client.on('messageCreate', (message) => {
-    if (message.content.startsWith(BOT_PREFIX))
+    if (message.content.startsWith(BOT_PREFIX) && !message.author.bot)
     {
         // Get Command
         const userCommand = message.content.slice(BOT_PREFIX.length, message.content.length).split(' ')
@@ -71,7 +71,14 @@ client.on('messageCreate', (message) => {
         message['__BOT_PREFIX'] = BOT_PREFIX
 
         // If the command is valid, run the function and pass the message, arguments and roles for the server
-        if(commands[command]) (commands[command](message, args, Roles[message.member.guild.id]))
+        if(commands[command]){
+            commands[command](message, args, Roles[message.member.guild.id])
+        } else {
+            // If command not valid
+            message.reply(`\`${command}\` is not a valid command.`).then(msg => {
+                setTimeout(() => msg.delete(), 2000)
+            })
+        }
     }
 })
 
