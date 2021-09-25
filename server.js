@@ -1,6 +1,7 @@
 const fs = require('fs')
+const path = require('path')
 
-const { Client, Intents, Role } = require('discord.js')
+const { Client, Intents, Role, Collection } = require('discord.js')
 
 const botIntentList = new Intents()
 botIntentList.add(
@@ -10,11 +11,17 @@ botIntentList.add(
     )
 
 const client = new Client({ intents: botIntentList })
-const commands = require('./scripts/commands.js');
-const Roles = {}
+const commands = new Collection();
+const commandsDirectory = fs.readdirSync('./scripts').filter(file => file.endsWith('.js'))
 
+commandsDirectory.map(commandFile => {
+    // Assuming each File inside the directory is a Bot Command
+    const command = require(`./scripts/${commandFile}`);
+    commands.set(command.name, command);
+});
 
 // Load TOKEN and Prefix
+
 
 var TOKEN = ''
 var BOT_PREFIX = ''
@@ -44,18 +51,9 @@ const changeEnvInfo = (row, data) => {
     return
 }
 client.once('ready', (c) => {
-    
-    c.guilds.cache.find(g => {
-        Roles[`${g.id}`] = []
-
-        g.roles.cache.find(r => {
-            Roles[`${g.id}`].push({
-                role: r
-            })
-        })
-    })
 
     console.log('Woohoo! I\'m up and running!')
+    client.user.setActivity(`Managing ${client.guilds.cache.size} Servers! Need help?\nTry: \`${BOT_PREFIX}help\``)
     
 })
 
@@ -64,27 +62,64 @@ client.on('messageCreate', (message) => {
     {
         // Get Command
         const userCommand = message.content.slice(BOT_PREFIX.length, message.content.length).split(' ')
-        const command = userCommand[0]
+        const command = userCommand[0].toLowerCase()
         const args = userCommand.slice(1)
         
-        // Bundle PREFIX with Message - easier to access on `commands.js`
-        message['__BOT_PREFIX'] = BOT_PREFIX
-
-        // If the command is valid, run the function and pass the message, arguments and roles for the server
-        if(commands[command]){
-            commands[command](message, args, Roles[message.member.guild.id])
-        } else {
-            // If command not valid
-            message.reply(`\`${command}\` is not a valid command.`).then(msg => {
-                setTimeout(() => msg.delete(), 2000)
+        if(command === ('help' || 'info'))
+        {
+            if(args.length && commands.get(args[0]))
+            {
+                c = commands.get(args[0])
+                message.reply(`\`${c.name}\` - \`${c.description}\` (usage: \`${c.usage}\`)`)
+            }
+            messageResponse = 'List of Commands:\n\n'
+            commands.map(c => {
+                messageResponse += ` \`${c.name}\` - \`${c.description}\` (usage: \`${c.usage}\`)\n\n`
             })
+
+            console.log(messageResponse)
+
+            message.reply(messageResponse)
+        }
+            // Check all Permissions
+        const c = commands.get(command) || commands.find(commandAlias => commandAlias.alias.includes(command))
+
+        if(c)
+        {
+            if (c.arguments && !args.length) // Check if the Right amount of Arguments are passed!
+            {
+                message.reply('Sorry, but arguments are needed to run that command!\nCorrect usage: ' + `\`${BOT_PREFIX}${command} ${c.usage}\``)
+                return
+            }
+
+            if (c.guildOnly && message.channel.type == 'dm') // Check if Command is Guild Only
+            {
+                message.reply('Sorry, this command can only be run in Servers!')
+                return
+            }
+
+            if (c.permissions)
+            {
+                if(!message.member.permissions.has(c.permissions))
+                {
+                    message.reply('You do not have the valid permissions! Permissions needed are:\n' + c.permissions)
+                }
+            }
+
+
+            // CAN RUN THE COMMAND
+
+            try {
+                c.execute(message, args)
+            } catch (error) {
+                console.error(error)
+                message.reply('Sorry, something went wrong with the command!')
+            }
+
+
         }
     }
 })
 
 client.login(TOKEN)
-
-exports.getValues = function(){
-    console.log('Hello')
-}
 exports.changeEnvInfo = changeEnvInfo
