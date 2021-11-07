@@ -13,7 +13,7 @@ const client = new Client({ intents: botIntentList })
 const commands = new Collection();
 const commandsDirectory = fs.readdirSync('./scripts').filter(file => file.endsWith('.js'))
 
-commandsDirectory.map(commandFile => {
+commandsDirectory.forEach(commandFile => {
     // Assuming each File inside the directory is a Bot Command
     const command = require(`./scripts/${commandFile}`);
     commands.set(command.name, command);
@@ -46,7 +46,7 @@ client.on('messageCreate', (message) => {
                 message.reply(`\`${c.name}\` - \`${c.description}\` (usage: \`${c.usage}\`)`)
             }
             messageResponse = 'List of Commands:\n\n'
-            commands.map(c => {
+            commands.forEach(c => {
                 messageResponse += ` \`${c.name}\` - \`${c.description}\` (usage: \`${c.usage}\`)\n\n`
             })
 
