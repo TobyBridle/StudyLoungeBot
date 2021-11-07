@@ -1,0 +1,23 @@
+{
+  "name": "studyloungebot",
+  "version": "1.0.0",
+  "description": "This is a bot specifically made for use on the StudyLounge discord server. It will not work on any other server ( not sure why\r you would want it ) and has been made open-source so the Computer Science nerds can waste their time contributing",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TobyBridle/StudyLoungeBot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TobyBridle/StudyLoungeBot/issues"
+  },
+  "homepage": "https://github.com/TobyBridle/StudyLoungeBot#readme",
+  "dependencies": {
+    "discord.js": "^13.3.1"
+  }
+}
