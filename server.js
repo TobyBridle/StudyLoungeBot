@@ -1,4 +1,5 @@
 const fs = require('fs')
+const cdh = require("chuckdatahandler");
 
 const { Client, Intents, Role, Collection } = require('discord.js')
 
@@ -22,6 +23,8 @@ commandsDirectory.forEach(commandFile => {
 // Load TOKEN and Prefix
 const {TOKEN, BOT_PREFIX} = require("./values.json")
 
+cdh.createDataDirs();
+
 
 client.once('ready', (c) => {
 
@@ -31,13 +34,22 @@ client.once('ready', (c) => {
 })
 
 client.on('messageCreate', (message) => {
-    if (message.content.startsWith(BOT_PREFIX) && !message.author.bot)
+    if (message.author.bot) return;
+    if ((!("prefix" in cdh.read_data_guild(message.guild.id)))) {
+        cdh.write_data_guild(message.guild.id, "prefix", BOT_PREFIX);
+    }
+    var current_prefix = cdh.read_data_guild(message.guild.id)["prefix"];
+    if (message.content.startsWith(current_prefix) && !message.author.bot)
     {
         // Get Command
-        const userCommand = message.content.slice(BOT_PREFIX.length, message.content.length).split(' ')
+        const userCommand = message.content.slice(current_prefix.length, message.content.length).split(' ')
         const command = userCommand[0].toLowerCase()
         const args = userCommand.slice(1)
         
+        if (command == "") {
+            return;
+        }
+
         if(command === ('help' || 'info'))
         {
             if(args.length && commands.get(args[0]))
@@ -56,12 +68,11 @@ client.on('messageCreate', (message) => {
         }
             // Check all Permissions
         const c = commands.get(command) || commands.find(commandAlias => commandAlias.alias.includes(command))
-
         if(c)
         {
             if (c.arguments && !args.length) // Check if the Right amount of Arguments are passed!
             {
-                message.reply('Sorry, but arguments are needed to run that command!\nCorrect usage: ' + `\`${BOT_PREFIX}${command} ${c.usage}\``)
+                message.reply('Sorry, but arguments are needed to run that command!\nCorrect usage: ' + `\`${current_prefix}${command} ${c.usage}\``)
                 return
             }
 
