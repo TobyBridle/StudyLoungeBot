@@ -1,5 +1,4 @@
 const fs = require('fs')
-const path = require('path')
 
 const { Client, Intents, Role, Collection } = require('discord.js')
 
@@ -14,42 +13,16 @@ const client = new Client({ intents: botIntentList })
 const commands = new Collection();
 const commandsDirectory = fs.readdirSync('./scripts').filter(file => file.endsWith('.js'))
 
-commandsDirectory.map(commandFile => {
+commandsDirectory.forEach(commandFile => {
     // Assuming each File inside the directory is a Bot Command
     const command = require(`./scripts/${commandFile}`);
     commands.set(command.name, command);
 });
 
 // Load TOKEN and Prefix
+const {TOKEN, BOT_PREFIX} = require("./values.json")
 
 
-var TOKEN = ''
-var BOT_PREFIX = ''
-
-const getValues = (path) => {
-    fileData = JSON.parse(fs.readFileSync(`${path}values.json`));
-    
-    TOKEN = fileData['TOKEN']
-    BOT_PREFIX = fileData['BOT_PREFIX']
-    
-    return
-}
-
-getValues('./')
-
-
-const changeEnvInfo = (row, data) => {
-    const fileData = JSON.parse(fs.readFileSync('./values.json'))
-    if(fileData[row])
-    {
-        fileData[row] = data
-        fs.writeFileSync('./values.json', JSON.stringify(fileData)) // Rewrite data
-        // Re read
-        getValues('./')
-        return true // Is this appropriate? (Return value used in other function)
-    }
-    return
-}
 client.once('ready', (c) => {
 
     console.log('Woohoo! I\'m up and running!')
@@ -73,7 +46,7 @@ client.on('messageCreate', (message) => {
                 message.reply(`\`${c.name}\` - \`${c.description}\` (usage: \`${c.usage}\`)`)
             }
             messageResponse = 'List of Commands:\n\n'
-            commands.map(c => {
+            commands.forEach(c => {
                 messageResponse += ` \`${c.name}\` - \`${c.description}\` (usage: \`${c.usage}\`)\n\n`
             })
 
@@ -122,4 +95,26 @@ client.on('messageCreate', (message) => {
 })
 
 client.login(TOKEN)
-exports.changeEnvInfo = changeEnvInfo
+
+function exitHandler(options, exitCode) {
+    if (options.cleanup) {
+        client.destroy();
+    }
+}
+
+
+process.on('exit', exitHandler.bind(null, { cleanup: true }));
+process.on('SIGINT', exitHandler.bind(null, { cleanup: true }));
+process.on('SIGTERM', exitHandler.bind(null, { cleanup: true }));
+process.on('SIGUSR1', exitHandler.bind(null, { cleanup: true }));
+process.on('SIGUSR2', exitHandler.bind(null, { cleanup: true }));
+
+
+process.on('message', function (msg) {
+    console.log(msg)
+    if (msg == 'shutdown') {
+        console.log("Shutting down...")
+        client.destroy();
+        process.exit();
+    }
+});
