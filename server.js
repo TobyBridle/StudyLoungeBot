@@ -1,5 +1,4 @@
 const fs = require('fs')
-const path = require('path')
 
 const { Client, Intents, Role, Collection } = require('discord.js')
 
@@ -21,35 +20,9 @@ commandsDirectory.map(commandFile => {
 });
 
 // Load TOKEN and Prefix
+const {TOKEN, BOT_PREFIX} = require("./values.json")
 
 
-var TOKEN = ''
-var BOT_PREFIX = ''
-
-const getValues = (path) => {
-    fileData = JSON.parse(fs.readFileSync(`${path}values.json`));
-    
-    TOKEN = fileData['TOKEN']
-    BOT_PREFIX = fileData['BOT_PREFIX']
-    
-    return
-}
-
-getValues('./')
-
-
-const changeEnvInfo = (row, data) => {
-    const fileData = JSON.parse(fs.readFileSync('./values.json'))
-    if(fileData[row])
-    {
-        fileData[row] = data
-        fs.writeFileSync('./values.json', JSON.stringify(fileData)) // Rewrite data
-        // Re read
-        getValues('./')
-        return true // Is this appropriate? (Return value used in other function)
-    }
-    return
-}
 client.once('ready', (c) => {
 
     console.log('Woohoo! I\'m up and running!')
@@ -122,4 +95,3 @@ client.on('messageCreate', (message) => {
 })
 
 client.login(TOKEN)
-exports.changeEnvInfo = changeEnvInfo
