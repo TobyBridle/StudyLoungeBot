@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/TobyBridle/StudyLoungeBot#readme",
   "dependencies": {
-    "chuckdatahandler": "chuckdatahandler",
+    "chuckdatahandler": "^1.0.2",
     "discord.js": "^13.3.1"
   }
 }
