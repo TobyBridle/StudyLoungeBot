@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "pm2 start server.js -n slb -i 1 --wait-ready --shutdown-with-message"
   },
   "repository": {
     "type": "git",
@@ -18,7 +18,9 @@
   },
   "homepage": "https://github.com/TobyBridle/StudyLoungeBot#readme",
   "dependencies": {
+    "@pm2/io": "^5.0.0",
     "chuckdatahandler": "^1.0.2",
-    "discord.js": "^13.3.1"
+    "discord.js": "^13.3.1",
+    "pm2": "^5.1.2"
   }
 }

@@ -1,5 +1,6 @@
 const fs = require('fs')
 const cdh = require("chuckdatahandler");
+const pmx = require("@pm2/io");
 
 const { Client, Intents, Role, Collection } = require('discord.js')
 
@@ -98,6 +99,12 @@ client.on('messageCreate', (message) => {
 })
 
 client.login(TOKEN)
+
+pmx.action("query-guilds", async function (reply) {
+    setTimeout(() => {
+        reply(client.guilds.cache.map(guild => guild.name));
+    }, 1000); // delay stops pm2 from hanging at the end if the action is very fast
+});
 
 function exitHandler(options, exitCode) {
     if (options.cleanup) {
