@@ -8,7 +8,7 @@ botIntentList.add(
     Intents.FLAGS.GUILDS,
     Intents.FLAGS.GUILD_MESSAGES,
     Intents.FLAGS.DIRECT_MESSAGES
-    )
+)
 
 const client = new Client({ intents: botIntentList })
 const commands = new Collection();
@@ -21,16 +21,14 @@ commandsDirectory.forEach(commandFile => {
 });
 
 // Load TOKEN and Prefix
-const {TOKEN, BOT_PREFIX} = require("./values.json")
+const { TOKEN, BOT_PREFIX } = require("./values.json")
 
 cdh.createDataDirs();
 
 
 client.once('ready', (c) => {
-
     console.log('Woohoo! I\'m up and running!')
     client.user.setActivity(`Managing ${client.guilds.cache.size} Servers! Need help?\nTry: \`${BOT_PREFIX}help\``)
-    
 })
 
 client.on('messageCreate', (message) => {
@@ -39,21 +37,18 @@ client.on('messageCreate', (message) => {
         cdh.write_data_guild(message.guild.id, "prefix", BOT_PREFIX);
     }
     var current_prefix = cdh.read_data_guild(message.guild.id)["prefix"];
-    if (message.content.startsWith(current_prefix) && !message.author.bot)
-    {
+    if (message.content.startsWith(current_prefix) && !message.author.bot) {
         // Get Command
         const userCommand = message.content.slice(current_prefix.length, message.content.length).split(' ')
         const command = userCommand[0].toLowerCase()
         const args = userCommand.slice(1)
-        
+
         if (command == "") {
             return;
         }
 
-        if(command === ('help' || 'info'))
-        {
-            if(args.length && commands.get(args[0]))
-            {
+        if (command === ('help' || 'info')) {
+            if (args.length && commands.get(args[0])) {
                 c = commands.get(args[0])
                 message.reply(`\`${c.name}\` - \`${c.description}\` (usage: \`${c.usage}\`)`)
             }
@@ -66,10 +61,9 @@ client.on('messageCreate', (message) => {
 
             message.reply(messageResponse)
         }
-            // Check all Permissions
+        // Check all Permissions
         const c = commands.get(command) || commands.find(commandAlias => commandAlias.alias.includes(command))
-        if(c)
-        {
+        if (c) {
             if (c.arguments && !args.length) // Check if the Right amount of Arguments are passed!
             {
                 message.reply('Sorry, but arguments are needed to run that command!\nCorrect usage: ' + `\`${current_prefix}${command} ${c.usage}\``)
@@ -82,10 +76,8 @@ client.on('messageCreate', (message) => {
                 return
             }
 
-            if (c.permissions)
-            {
-                if(!message.member.permissions.has(c.permissions))
-                {
+            if (c.permissions) {
+                if (!message.member.permissions.has(c.permissions)) {
                     message.reply('You do not have the valid permissions! Permissions needed are:\n' + c.permissions)
                 }
             }
